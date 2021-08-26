@@ -67,7 +67,7 @@ class Avenger {
 
 }
 
-const oneAvenger = new Avenger('Hulk', 'Bruce Baner', [{ title: 'The Incredible Hulk' }, { title: 'Thor 3 : Ragnarock' }, { title: 'Avengers' }, { title: 'Avengers : Age of Ultron' }, { title: 'Avengers : Infinity War' }, { title: 'Avengers : Endgame' }])
+const oneAvenger = new Avenger('hulk', 'Bruce Baner', [{ title: 'The Incredible Hulk' }, { title: 'Thor 3 : Ragnarock' }, { title: 'Avengers' }, { title: 'Avengers : Age of Ultron' }, { title: 'Avengers : Infinity War' }, { title: 'Avengers : Endgame' }])
 console.log(oneAvenger);
 
 console.log(avenger.hero);
