@@ -9,5 +9,5 @@ const server = http.createServer((request, response) => {
 });
 
 server.listen(2899, '127.0.0.1', () => {
-    console.log('Le serveur est démaré');
+    console.log('Le serveur est Démaré');
 });
