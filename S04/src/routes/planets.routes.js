@@ -4,6 +4,8 @@ import HttpStatus from 'http-status';
 
 import PLANETS from '../data/planets.js'; // Possible de Import, car il y a un export dans le fichier planets.js
 
+import planetsRepository from '../repositories/planets.repository.js';
+
 const router = express.Router();
 
 class PlanetsRoutes {
@@ -17,25 +19,41 @@ class PlanetsRoutes {
         router.put('/:idPlanet', this.put);
     }
 
-    getAll(req, res, next) {
-        res.status(HttpStatus.OK);
-        res.set('Content-Type', 'application/json');
+    async getAll(req, res, next) {
 
-        res.send(PLANETS);
+        const filter = {};
+        if(req.query.explorer) {
+            filter.discoveredBy = req.query.explorer;
+        }
+
+        try {
+
+            const planets = await planetsRepository.retrieveAll(filter);
+
+            res.status(200).json(planets);
+
+        } catch(err) {
+            return next(err);
+        }
     }
 
-    getOne(req, res, next) {
+    async getOne(req, res, next) {
         const idPlanet = req.params.idPlanet;
-        console.log(idPlanet);
 
-        const planet = PLANETS.find(p => p.id == idPlanet);
+        try{            
+            const planet = await planetsRepository.retrieveById(idPlanet);
+            console.log(planet);
+    
+            if(!planet) {
+                // 2. La planete n'existe pas = 404 - Not found
+                return next(HttpError.NotFound(`La planete avec le id ${idPlanet} n'existe pas.`));
+            } else {
+                // 1. La planete existe = 200 - OK
+                res.status(200).json(planet); // fait Content-Type et Send la reponse
+            }
 
-        if(!planet) {
-            // 2. La planete n'existe pas = 404 - Not found
-            return next(HttpError.NotFound(`La planete avec le id ${idPlanet} n'existe pas.`));
-        } else {
-            // 1. La planete existe = 200 - OK
-            res.status(200).json(planet); // fait Content-Type et Send la reponse
+        } catch(err) {
+            return next(err);
         }
     }
 
