@@ -1,6 +1,6 @@
 import express from 'express';
 import HttpError from 'http-errors';
-import HttpStatus from 'http-status';
+import httpStatus from 'http-status';
 
 import ELEMENTS from '../data/elements.js';
 
@@ -17,61 +17,56 @@ class ElementsRoutes {
     }
 
     getAll(req, res, next) {
-       res.status(HttpStatus.OK);
-       
-       res.set('Content-Type', 'application/json');
-
-       res.send(ELEMENTS);
+        res.status(200);
+        res.set("Content-Type", "application/json");       
+        res.send(ELEMENTS);
     }
 
     getOne(req, res, next) {
-       const symbol = req.params.symbol;
-       console.log(symbol);
+        const idElement = req.params.idElement;      
+        const elements = ELEMENTS.find(e=>e.id == idElement)      
 
-       const element = ELEMENTS.find(e => e.symbol == symbol);
-
-       if(!element) {
-        
-        return next(HttpError.NotFound(`L'element avec le symbol ${sElement} n'existe pas.`));
-    } else {
-        
-        res.status(200).json(element); // fait Content-Type et Send la reponse
-    }
+        if(!elements){
+            return next(HttpError.NotFound(`L'élément avec le id ${idElement} n'existe pas.`));
+        }
+        else{
+            res.status(200);
+            res.json(elements);
+        }
     }
 
     post(req, res, next) {
         const newElement = req.body;
 
-        const element = ELEMENTS.find(e => e.symbol == newElement.symbol); 
-        if(element) {
-            // J'ai un doublon === ERREUR
-            return next(HttpError.Conflict(`L'element avec le symbol ${newElement.symbol} existe déjà.`));
-        } else {
-            
-            ELEMENTS.push(newElement);
-            
-            res.status(HttpStatus.CREATED); // 201
-            res.json(newElement);
-
-        }
+        const elements = ELEMENTS.find(e=>e.symbol == newElement.symbol)
+            if(elements)
+            {
+                return next(HttpError.Conflict(`l'élément avec l'id ${newElement} existe déjà.`));
+            }
+            else{
+                ELEMENTS.push(newElement);
+                res.status(httpStatus.CREATED); //201
+                res.json(newElement);
+            }
         
     }
     
     delete(req, res, next) {
         const symbol = req.params.symbol;
-        console.log(symbol);
 
-        const index = ELEMENTS.findIndex(e => e.symbol == symbol);
-
-        if(index == -1) {
-            return next(HttpError.NotFound(`L'element avec le symbol ${symbol} n'existe pas.`));
-        } else {
-            ELEMENTS.splice(index, 1);
-            res.status(HttpStatus.NO_CONTENT).end(); // 204
-        }
+        const index = ELEMENTS.findIndex(e=>e.symbol == symbol)
+        if(index == -1)
+            {     
+                return next(HttpError.NotFound(`L'élément avec le SYMBOL ${symbol} n'existe pas.`));
+            }
+            else
+            {
+                //La planete existe
+                ELEMENTS.splice(index, 1);
+                res.status(httpStatus.NO_CONTENT).end();
+            }
     }
 }
 
 new ElementsRoutes();
-
 export default router;

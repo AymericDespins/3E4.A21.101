@@ -1,19 +1,21 @@
-import mongoose from 'mongoose';
+import Mongoose from "mongoose";
 
-const planetSchema = mongoose.Schema({
-    name: {type: String, unique:true, required:true},
-    discoveredBy: {type: String, required:true, index:true},
+const planetShema = Mongoose.Schema({
+
+    name:{type:String, unique:true, required:true},
+    discoveredBy:{type:String, required:true, index:true},
     discoveryDate: Date,
-    temperature:Number,
+    temperature: Number,
     satellites: [String],
-    position: {
-        x:{type: Number, required:true, min:-1000, max:1000},
-        y:{type: Number, required:true, min:-1000, max:1000},
-        z:{type: Number, required:true, min:-1000, max:1000}
+    position:{
+        x:{type:Number, required:true, min:-1000, max:1000},
+        y:{type:Number, required:true, min:-1000, max:1000},
+        z:{type:Number, required:true, min:-1000, max:1000}
     }
 }, {
-    collection:'planets',
-    strict:'throw'
+
+    collection:"planets",
+    strict:"throw"
 });
 
-export default mongoose.model('Planet', planetSchema);
+export default Mongoose.model("Planet", planetShema); // Mangoose ssait qu'il y a une collection de planetes
