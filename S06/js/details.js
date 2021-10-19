@@ -1,4 +1,5 @@
 const urlParams = {};
+const ELEMENT_IMG_URL = 'https://assets.andromia.science/elements';
 (window.onpopstate = function () {
     let match;
     const pl = /\+/g; // Regex for replacing addition symbol with a space
@@ -12,19 +13,75 @@ const urlParams = {};
 })();
 
 $(document).ready(() => {
-    getPlanet(urlParams.planet);
+    getPlanet(urlParams.planet); // Permet d'aller selectionner un de tous les parametres de l'url
 
     $('#btnAddPortal').click(() => {
         addPortal();
     });
+
+    $('#btnMiner').click(() => {
+        minePlanet();
+    });
 });
 
-function addPortal() {
-    const position = $('#txtPosition').val();
-    const affinity = $('#cboAffinity').val();
+async function minePlanet() {
+    
+    //GET
+    const MINING_URL = `${urlParams.planet}/actions?type=mine`;
 
-    console.log(position);
-    console.log(affinity);
+    const response = await axios.get(MINING_URL);
+        
+    console.log(response);
+    if(response.status === 200) {
+        const elements = response.data;
+
+            $('#extraction tbody').empty();
+
+            elements.forEach(e => {
+                
+                let elementHtml = '<tr>';
+                elementHtml += `<td><img class="element" src="${ELEMENT_IMG_URL}/${e.element}.png" /> ${e.element}</td>`
+                elementHtml += `<td>${e.quantity}</td>`;
+                elementHtml += '</tr>';
+
+                $('#extraction tbody').append(elementHtml);
+            });
+        } else {
+            console.log(response);
+        }
+}
+
+
+async function addPortal() {
+
+    const isPortalValid = document.getElementById('txtPosition').checkValidity();
+
+    if(isPortalValid) {
+
+        const position = $('#txtPosition').val();
+        const affinity = $('#cboAffinity').val();
+
+        const CREATE_PORTAL_URL = `${urlParams.planet}/portals`;
+
+        const body = {
+            position: position,
+            affinity: affinity
+        }
+
+        const response = await axios.post(CREATE_PORTAL_URL, body) 
+        
+        if(response.status===201) {
+            const newPortal = response.data;
+            const portalHtml = displayAPortal(newPortal);
+
+            $('#portals tbody').append(portalHtml);
+
+        } else {
+            console.log(response);
+        }
+    } else {
+        console.log('Portal dans un format invalide');
+    }
 }
 
 async function getPlanet(url) {
@@ -63,13 +120,20 @@ function displayPortals(portals) {
     let portalsHtml = '';
     
     portals.forEach( p => {
-        portalsHtml += '<tr>';
-        portalsHtml += `<td>${p.position}</td>`;
-        portalsHtml += `<td><img src="img/${p.affinity}.png" title="${p.affinity}"/></td>`;
-        portalsHtml += '</tr>';
+        portalsHtml += displayAPortal(p);
     });
 
     $('#portals tbody').html(portalsHtml);
 
     // 4. Ajouter la chaine dans la page
+}
+
+function displayAPortal(p) {
+    let portalHtml = '';
+
+    portalHtml += '<tr>';
+    portalHtml += `<td>${p.position}</td>`;
+    portalHtml += `<td><img src="img/${p.affinity}.png" title="${p.affinity}"/></td>`;
+    portalHtml += '</tr>';
+    return portalHtml;
 }
